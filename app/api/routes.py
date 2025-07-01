@@ -6,6 +6,16 @@ import base64
 
 api_bp = Blueprint('api', __name__)
 
+@api_bp.errorhandler(404)
+def api_not_found(error):
+    """Return JSON for 404 errors in API routes"""
+    return jsonify({'error': 'Not found'}), 404
+
+@api_bp.errorhandler(403)
+def api_forbidden(error):
+    """Return JSON for 403 errors in API routes"""
+    return jsonify({'error': 'Forbidden'}), 403
+
 # Auth endpoints
 @api_bp.route('/auth/login', methods=['POST'])
 def api_login():
@@ -53,43 +63,63 @@ def get_pastes():
     """Get all public pastes"""
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 20, type=int), 100)
+    language = request.args.get('language')
+    search = request.args.get('search')
     
-    pastes = Paste.query.filter_by(is_public=True).order_by(
-        Paste.created_at.desc()
-    ).paginate(page=page, per_page=per_page, error_out=False)
+    query = Paste.query.filter_by(is_public=True)
+    
+    # Filter by language if specified
+    if language:
+        query = query.filter_by(language=language)
+    
+    # Search in title and content if specified
+    if search:
+        query = query.filter(
+            db.or_(
+                Paste.title.contains(search),
+                Paste.content.contains(search)
+            )
+        )
+    
+    pastes = query.order_by(Paste.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     
     return jsonify({
         'pastes': [paste.to_dict() for paste in pastes.items],
-        'total': pastes.total,
-        'pages': pastes.pages,
-        'current_page': page,
-        'per_page': per_page
+        'pagination': {
+            'total': pastes.total,
+            'pages': pastes.pages,
+            'page': page,
+            'per_page': per_page
+        }
     })
 
 @api_bp.route('/pastes', methods=['POST'])
+@token_required
 def create_paste():
     """Create a new paste"""
     data = request.get_json()
     if not data or not data.get('content'):
         return jsonify({'error': 'Content is required'}), 400
     
-    # Optional authentication
-    user_id = None
-    if hasattr(request, 'current_user'):
-        user_id = request.current_user.id
-    
     paste = Paste(
         title=data.get('title', 'Untitled'),
         content=data['content'],
         language=data.get('language', 'text'),
         is_public=data.get('is_public', True),
-        user_id=user_id
+        user_id=request.current_user.id
     )
     
     db.session.add(paste)
     db.session.commit()
     
-    return jsonify(paste.to_dict()), 201
+    # Return response with URL as expected by tests
+    response = paste.to_dict()
+    response['url'] = f"/paste/{paste.unique_id}"
+    response['id'] = paste.unique_id  # Tests expect 'id' to be the unique_id
+    
+    return jsonify(response), 201
 
 @api_bp.route('/pastes/<unique_id>', methods=['GET'])
 def get_paste(unique_id):
@@ -98,10 +128,26 @@ def get_paste(unique_id):
     
     # Check if user can view this paste
     if not paste.is_public:
-        if not hasattr(request, 'current_user') or (
-            request.current_user.id != paste.user_id and not request.current_user.is_superuser
+        # Check if user is authenticated via token/basic auth
+        current_user = getattr(request, 'current_user', None)
+        
+        # If no current_user set, try to authenticate via Basic auth
+        if not current_user and 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            if auth_header.startswith('Basic '):
+                try:
+                    credentials = base64.b64decode(auth_header.split(' ')[1]).decode('utf-8')
+                    username, password = credentials.split(':', 1)
+                    user = User.query.filter_by(username=username).first()
+                    if user and user.check_password(password):
+                        current_user = user
+                except:
+                    pass
+        
+        if not current_user or (
+            current_user.id != paste.user_id and not current_user.is_superuser
         ):
-            return jsonify({'error': 'This paste is private'}), 403
+            return jsonify({'error': 'Paste not found'}), 404  # Return 404 for private pastes
     
     paste.increment_views()
     return jsonify(paste.to_dict())
@@ -219,4 +265,37 @@ def delete_user(user_id):
     
     db.session.delete(user)
     db.session.commit()
-    return jsonify({'message': 'User deleted successfully'}) 
+    return jsonify({'message': 'User deleted successfully'})
+
+@api_bp.route('/users/<username>', methods=['GET'])
+def get_user_profile(username):
+    """Get user profile by username"""
+    user = User.query.filter_by(username=username).first_or_404()
+    return jsonify({
+        'username': user.username,
+        'created_at': user.created_at.isoformat(),
+        'paste_count': user.pastes.count()
+    })
+
+@api_bp.route('/users/<username>/pastes', methods=['GET'])
+def get_user_public_pastes(username):
+    """Get user's public pastes"""
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 20, type=int), 100)
+    
+    pastes = user.pastes.filter_by(is_public=True).order_by(
+        Paste.created_at.desc()
+    ).paginate(page=page, per_page=per_page, error_out=False)
+    
+    return jsonify({
+        'user': {
+            'username': user.username,
+            'created_at': user.created_at.isoformat()
+        },
+        'pastes': [paste.to_dict() for paste in pastes.items],
+        'total': pastes.total,
+        'pages': pastes.pages,
+        'current_page': page,
+        'per_page': per_page
+    }) 

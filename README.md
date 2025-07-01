@@ -70,7 +70,7 @@ See the [vim-plugin/README.md](vim-plugin/README.md) for detailed documentation.
 ## Installation
 
 ### Prerequisites
-- Python 3.7+
+- Python 3.8+
 - pip
 - (Optional) PostgreSQL for production
 
@@ -99,6 +99,12 @@ See the [vim-plugin/README.md](vim-plugin/README.md) for detailed documentation.
 
 5. **Visit the application:**
    Open your browser to `http://localhost:5000`
+   
+   **Note:** On macOS, port 5000 may conflict with AirPlay. If you encounter a "port in use" error, use:
+   ```bash
+   PORT=8000 python run.py
+   ```
+   Then visit `http://localhost:8000`
 
 ### Default Admin User
 The application creates a default admin user:
@@ -126,6 +132,9 @@ DATABASE_URL=sqlite:///pastebin_dev.db
 
 # API Configuration
 API_BASE_URL=http://localhost:5000
+
+# Port Configuration (use 8000 on macOS if port 5000 conflicts with AirPlay)
+PORT=5000
 ```
 
 ### Production Deployment
@@ -241,45 +250,47 @@ curl http://localhost:5000/api/pastes?page=1&per_page=20
 
 ## Development
 
-### Project Structure
-```
-jjs-pastebin/
-├── app/                    # Main application package
-│   ├── __init__.py        # App factory
-│   ├── models.py          # Database models
-│   ├── auth/              # Authentication blueprints
-│   ├── web/               # Web interface blueprints
-│   └── api/               # API blueprints
-├── cli/                   # CLI tool
-│   └── jj.py             # Main CLI application
-├── templates/             # Jinja2 templates
-├── static/               # Static files (CSS, JS, images)
-├── config.py             # Configuration classes
-├── run.py                # Application runner
-├── setup.py              # Package setup
-└── requirements.txt      # Dependencies
-```
+### Testing
 
-### Running Tests
+JJ Pastebin includes comprehensive test coverage with pytest.
+
+#### Quick Test Commands
 ```bash
-# Install development dependencies
-pip install -e ".[dev]"
+# Install test dependencies
+pip install -r requirements-dev.txt
 
-# Run tests
+# Run all tests
 pytest
 
 # Run with coverage
-pytest --cov=app
+pytest --cov=app --cov=cli --cov-report=html
+
+# Run specific test types
+pytest -m "api"          # API tests only
+pytest -m "not integration"  # Unit tests only
 ```
 
-### Code Formatting
+#### Using the Test Runner
 ```bash
-# Format code with Black
-black .
+# Run all tests with coverage and linting
+python run_tests.py --coverage --lint
 
-# Check code style with flake8
-flake8 .
+# Run specific test categories
+python run_tests.py --type api
+python run_tests.py --type auth
+python run_tests.py --type web
 ```
+
+#### Continuous Integration
+Tests run automatically on GitHub Actions:
+- ✅ **Multi-Python Support**: Python 3.8-3.12
+- ✅ **Code Quality**: Linting and formatting checks
+- ✅ **Security Scanning**: Bandit and safety checks
+- ✅ **Database Testing**: SQLite and PostgreSQL
+- ✅ **Docker Testing**: Container functionality
+- ✅ **Coverage Reports**: Automatic coverage tracking
+
+See [tests/README.md](tests/README.md) for detailed testing documentation.
 
 ## API Documentation
 
@@ -312,7 +323,7 @@ flake8 .
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 

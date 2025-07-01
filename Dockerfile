@@ -21,6 +21,9 @@ COPY . .
 # Install the CLI tool
 RUN pip install -e .
 
+# Create necessary directories
+RUN mkdir -p instance
+
 # Create non-root user
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser

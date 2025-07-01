@@ -76,7 +76,7 @@ class Paste(db.Model):
     
     def to_dict(self):
         return {
-            'id': self.id,
+            'id': self.unique_id,
             'unique_id': self.unique_id,
             'title': self.title,
             'content': self.content,

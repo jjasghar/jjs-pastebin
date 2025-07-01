@@ -68,15 +68,23 @@ def index():
     return render_template('index.html', pastes=pastes)
 
 @web_bp.route('/create', methods=['GET', 'POST'])
+@login_required
 def create_paste():
     form = PasteForm()
     if form.validate_on_submit():
+        # Handle boolean field explicitly by checking raw form data
+        raw_is_public = request.form.get('is_public', '').lower()
+        if raw_is_public in ('false', 'f', '0', ''):
+            is_public = False
+        else:
+            is_public = bool(form.is_public.data)
+        
         paste = Paste(
-            title=form.title.data,
+            title=form.title.data or 'Untitled',
             content=form.content.data,
             language=form.language.data,
-            is_public=form.is_public.data,
-            user_id=current_user.id if current_user.is_authenticated else None
+            is_public=is_public,
+            user_id=current_user.id
         )
         db.session.add(paste)
         db.session.commit()
@@ -94,8 +102,9 @@ def view_paste(unique_id):
         if not current_user.is_authenticated or (
             current_user.id != paste.user_id and not current_user.is_superuser
         ):
-            flash('This paste is private.', 'error')
-            return redirect(url_for('web.index'))
+            # Return 404 for private pastes to unauthorized users
+            from flask import abort
+            abort(404)
     
     # Increment view count
     paste.increment_views()
@@ -130,10 +139,17 @@ def edit_paste(unique_id):
     
     form = PasteForm(obj=paste)
     if form.validate_on_submit():
+        # Handle boolean field explicitly by checking raw form data
+        raw_is_public = request.form.get('is_public', '').lower()
+        if raw_is_public in ('false', 'f', '0', ''):
+            is_public = False
+        else:
+            is_public = bool(form.is_public.data)
+        
         paste.title = form.title.data
         paste.content = form.content.data
         paste.language = form.language.data
-        paste.is_public = form.is_public.data
+        paste.is_public = is_public
         db.session.commit()
         flash('Paste updated successfully!', 'success')
         return redirect(url_for('web.view_paste', unique_id=unique_id))

@@ -28,15 +28,21 @@ def deploy():
         print("Password: admin123")
         print("Please change this password after first login!")
 
+# Create app instance for Gunicorn
+app = create_app()
+
+# Run deployment tasks when in production/Docker
+if os.environ.get('FLASK_ENV') == 'production':
+    with app.app_context():
+        deploy()
+
 if __name__ == '__main__':
-    app = create_app()
-    
-    # Run deployment if database doesn't exist
-    if not os.path.exists('pastebin_dev.db'):
+    # Run deployment if database doesn't exist (development mode)
+    if not os.path.exists('instance/pastebin_dev.db'):
         with app.app_context():
             deploy()
     
-    # Start the application
+    # Start the application in development mode
     app.run(
         host='0.0.0.0',
         port=int(os.environ.get('PORT', 5000)),

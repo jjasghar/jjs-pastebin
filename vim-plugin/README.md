@@ -151,7 +151,7 @@ The plugin supports both authenticated and anonymous pasting:
 
 ## License
 
-This plugin is provided as-is for use with JJ Pastebin service.
+This plugin is licensed under the Apache License 2.0. See the main project LICENSE file for details.
 
 ## Contributing
 

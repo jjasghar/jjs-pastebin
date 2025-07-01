@@ -1,0 +1,227 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        # Skip psycopg2-binary for Python 3.12+
+        if [[ "${{ matrix.python-version }}" < "3.12" ]]; then
+          pip install psycopg2-binary
+        fi
+        # Install Werkzeug compatible version
+        pip install "Werkzeug<3.0.0"
+    
+    - name: Create instance directory
+      run: mkdir -p instance
+    
+    - name: Run tests with pytest
+      run: |
+        pytest tests/ -v --cov=app --cov=cli --cov-report=xml --cov-report=term-missing
+      env:
+        FLASK_ENV: testing
+        DATABASE_URL: "sqlite:///:memory:"
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install linting dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install "Werkzeug<3.0.0"
+    
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Check code formatting with black
+      run: |
+        black --check --diff .
+    
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only --diff .
+    
+    - name: Type check with mypy
+      run: |
+        mypy app/ cli/ --ignore-missing-imports
+      continue-on-error: true
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install security scanning tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install "Werkzeug<3.0.0"
+    
+    - name: Run bandit security linter
+      run: |
+        bandit -r app/ cli/ -f json -o bandit-report.json
+      continue-on-error: true
+    
+    - name: Run safety check
+      run: |
+        safety check --json --output safety-report.json
+      continue-on-error: true
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+      if: always()
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install "Werkzeug<3.0.0"
+        # Install PostgreSQL adapter for integration tests
+        pip install psycopg2-binary
+    
+    - name: Create instance directory
+      run: mkdir -p instance
+    
+    - name: Run integration tests
+      run: |
+        pytest tests/ -v -m "integration" --cov=app --cov-report=term-missing
+      env:
+        FLASK_ENV: testing
+        DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb"
+        TESTING: true
+    
+    - name: Test CLI functionality
+      run: |
+        # Start Flask app in background for CLI tests
+        python run.py &
+        sleep 5
+        # Run CLI tests
+        pytest tests/test_cli.py -v
+      env:
+        FLASK_ENV: testing
+        PORT: 5000
+
+  docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        docker build -t jjs-pastebin:test .
+    
+    - name: Test Docker container
+      run: |
+        # Start container
+        docker run -d -p 8000:5000 --name test-container jjs-pastebin:test
+        sleep 10
+        
+        # Test health endpoint
+        curl -f http://localhost:8000/ || exit 1
+        
+        # Cleanup
+        docker stop test-container
+        docker rm test-container
+    
+    - name: Test Docker Compose
+      run: |
+        # Test docker-compose configuration
+        docker-compose -f docker-compose.yml config
+        # Start services
+        docker-compose up -d
+        sleep 15
+        
+        # Test application
+        curl -f http://localhost:8000/ || exit 1
+        
+        # Cleanup
+        docker-compose down 

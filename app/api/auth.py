@@ -24,8 +24,12 @@ def token_required(f):
                     if user and user.check_password(password):
                         request.current_user = user
                         return f(*args, **kwargs)
+                    else:
+                        # Invalid basic auth - return 401 immediately
+                        return jsonify({'error': 'Invalid credentials'}), 401
             except:
-                pass
+                # Malformed auth header
+                return jsonify({'error': 'Invalid authorization header'}), 401
         
         # Check for token in query params
         if not token:

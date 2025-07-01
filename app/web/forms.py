@@ -36,5 +36,5 @@ class PasteForm(FlaskForm):
         'placeholder': 'Paste your code or text here...'
     })
     language = SelectField('Language', choices=LANGUAGES, default='text')
-    is_public = BooleanField('Public', default=True)
+    is_public = BooleanField('Public', default=True, false_values=('false', ''))
     submit = SubmitField('Create Paste') 
