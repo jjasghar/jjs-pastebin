@@ -3,24 +3,29 @@
 Setup script for JJ Pastebin CLI Tool
 """
 
-from setuptools import setup, find_packages
 import os
+
+from setuptools import setup
+
 
 # Read the README file for long description
 def read_readme():
-    readme_path = os.path.join(os.path.dirname(__file__), 'CLI-README.md')
+    readme_path = os.path.join(os.path.dirname(__file__), "CLI-README.md")
     if os.path.exists(readme_path):
-        with open(readme_path, 'r', encoding='utf-8') as f:
+        with open(readme_path, "r", encoding="utf-8") as f:
             return f.read()
     return "A command-line tool for uploading and managing code snippets with any pastebin-compatible service."
+
 
 # Read version from cli module
 def read_version():
     try:
         import cli
-        return getattr(cli, '__version__', '1.0.0')
-    except:
-        return '1.0.0'
+
+        return getattr(cli, "__version__", "1.0.0")
+    except Exception:
+        return "1.0.0"
+
 
 setup(
     name="jj-pastebin-cli",
@@ -80,4 +85,4 @@ setup(
     zip_safe=False,
     platforms=["any"],
     license="Apache License 2.0",
-) 
+)
