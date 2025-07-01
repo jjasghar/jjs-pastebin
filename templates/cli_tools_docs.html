@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-3">
+        <!-- Table of Contents -->
+        <div class="sticky-top" style="top: 20px;">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Table of Contents</h6>
+                </div>
+                <div class="card-body">
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="#overview">Overview</a>
+                        <a class="nav-link" href="#cli-tool">CLI Tool</a>
+                        <a class="nav-link ms-3" href="#cli-installation">Installation</a>
+                        <a class="nav-link ms-3" href="#cli-usage">Usage</a>
+                        <a class="nav-link ms-3" href="#cli-commands">Commands</a>
+                        <a class="nav-link ms-3" href="#cli-examples">Examples</a>
+                        <a class="nav-link" href="#vim-plugin">Vim Plugin</a>
+                        <a class="nav-link ms-3" href="#vim-installation">Installation</a>
+                        <a class="nav-link ms-3" href="#vim-usage">Usage</a>
+                        <a class="nav-link ms-3" href="#vim-commands">Commands</a>
+                        <a class="nav-link ms-3" href="#vim-examples">Examples</a>
+                        <a class="nav-link" href="#troubleshooting">Troubleshooting</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-9">
+        <div class="cli-tools-docs">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-terminal me-3"></i>CLI Tools
+                </h1>
+                <p class="lead text-muted">
+                    Command-line tools and editor plugins for JJ Pastebin
+                </p>
+            </div>
+
+            <!-- Overview -->
+            <section id="overview" class="mb-5">
+                <h2>Overview</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <p>JJ Pastebin provides two powerful command-line tools to make sharing code snippets even easier:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="text-center p-3">
+                                    <i class="fas fa-terminal fa-3x text-primary mb-3"></i>
+                                    <h5>CLI Tool</h5>
+                                    <p>Python-based command-line interface for uploading, managing, and viewing pastes directly from your terminal.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center p-3">
+                                    <i class="fab fa-vim fa-3x mb-3" style="color: #019833;"></i>
+                                    <h5>Vim Plugin</h5>
+                                    <p>Native Vim plugin for pasting code directly from your editor with simple commands.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CLI Tool Section -->
+            <section id="cli-tool" class="mb-5">
+                <h2><i class="fas fa-terminal me-2"></i>CLI Tool</h2>
+                
+                <!-- CLI Installation -->
+                <div id="cli-installation" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Installation</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>The CLI tool is a Python script that can be used directly or installed system-wide.</p>
+                            
+                            <h5>Option 1: Direct Usage</h5>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Clone the repository and use directly
+git clone https://github.com/jjasghar/jjs-pastebin.git
+cd jjs-pastebin
+
+# Make sure you have the required dependencies
+pip install click requests
+
+# Use the CLI tool
+python3 cli/jj.py --help</code></pre>
+                            </div>
+                            
+                            <h5 class="mt-4">Option 2: Install System-wide</h5>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Make the script executable and create a symlink
+chmod +x cli/jj.py
+sudo ln -s $(pwd)/cli/jj.py /usr/local/bin/jj
+
+# Now you can use 'jj' from anywhere
+jj --help</code></pre>
+                            </div>
+                            
+                            <h5 class="mt-4">Dependencies</h5>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Required Python packages
+pip install click requests</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLI Usage -->
+                <div id="cli-usage" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Quick Start</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>1. Setup</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Set your API endpoint
+jj --api-url {{ request.host_url.rstrip('/') }}/api</code></pre>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>2. Login (Optional)</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Login for private pastes
+jj login</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>3. Paste a File</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Upload any file
+jj paste myfile.py</code></pre>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>4. Paste from Stdin</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Pipe content
+echo "Hello World" | jj paste -</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLI Commands -->
+                <div id="cli-commands" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Commands Reference</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Command</th>
+                                            <th>Description</th>
+                                            <th>Options</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>jj paste &lt;file&gt;</code></td>
+                                            <td>Upload a file or stdin</td>
+                                            <td><code>-t</code> title, <code>-l</code> language, <code>-p</code> private</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>jj login</code></td>
+                                            <td>Login with username/password</td>
+                                            <td><code>-u</code> username, <code>-p</code> password</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>jj logout</code></td>
+                                            <td>Logout and clear credentials</td>
+                                            <td>None</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>jj list</code></td>
+                                            <td>List your pastes</td>
+                                            <td><code>-p</code> page number</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>jj view &lt;id&gt;</code></td>
+                                            <td>View a paste by ID</td>
+                                            <td>None</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>jj delete &lt;id&gt;</code></td>
+                                            <td>Delete a paste by ID</td>
+                                            <td>Confirmation required</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLI Examples -->
+                <div id="cli-examples" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Usage Examples</h4>
+                        </div>
+                        <div class="card-body">
+                            <h5>Basic File Upload</h5>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Upload a Python file (language auto-detected)
+jj paste script.py
+
+# Upload with custom title and language
+jj paste --title "My Script" --language python script.py
+
+# Upload as private paste
+jj paste --private config.json</code></pre>
+                            </div>
+                            
+                            <h5 class="mt-4">Pipe Content</h5>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Pipe command output
+ls -la | jj paste -
+
+# Pipe with custom title
+echo "Hello World" | jj paste - --title "Greeting"
+
+# Pipe log files
+tail -f /var/log/app.log | head -20 | jj paste --title "App Logs" -</code></pre>
+                            </div>
+                            
+                            <h5 class="mt-4">Managing Pastes</h5>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Login first
+jj login
+
+# List your pastes
+jj list
+
+# View a specific paste
+jj view abc123
+
+# Delete a paste
+jj delete abc123</code></pre>
+                            </div>
+                            
+                            <h5 class="mt-4">Advanced Usage</h5>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Use with different API endpoint
+jj --api-url https://pastebin.example.com/api paste file.py
+
+# Create private paste with custom settings
+jj paste --title "Secret Config" --language yaml --private secrets.yml
+
+# Quick one-liner for sharing terminal output
+history | tail -10 | jj paste - --title "Recent Commands"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vim Plugin Section -->
+            <section id="vim-plugin" class="mb-5">
+                <h2><i class="fab fa-vim me-2" style="color: #019833;"></i>Vim Plugin</h2>
+                
+                <!-- Vim Installation -->
+                <div id="vim-installation" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Installation</h4>
+                        </div>
+                        <div class="card-body">
+                            <h5>Automatic Installation</h5>
+                            <p>The easiest way to install the plugin is using the provided install script:</p>
+                            <div class="code-container">
+                                <pre><code class="language-bash">cd jjs-pastebin/vim-plugin
+chmod +x install.sh
+./install.sh</code></pre>
+                            </div>
+                            
+                            <h5 class="mt-4">Manual Installation</h5>
+                            <p>Copy the plugin files to your Vim directories:</p>
+                            <div class="code-container">
+                                <pre><code class="language-bash"># Copy plugin file
+cp jj-pastebin.vim ~/.vim/plugin/
+
+# Copy documentation
+cp jj-pastebin.txt ~/.vim/doc/
+
+# Generate help tags in Vim
+vim -c "helptags ~/.vim/doc" -c "quit"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vim Usage -->
+                <div id="vim-usage" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Configuration</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>Add these settings to your <code>~/.vimrc</code> file:</p>
+                            
+                            <div class="code-container">
+                                <pre><code class="language-vim">" JJ Pastebin Configuration
+let g:jj_pastebin_url = "{{ request.host_url.rstrip('/') }}"
+let g:jj_pastebin_username = "your_username"
+let g:jj_pastebin_password = "your_password"
+
+" Optional: Default to private pastes
+let g:jj_pastebin_private = 0
+
+" Optional: Auto-copy URL to clipboard
+let g:jj_pastebin_copy_url = 1</code></pre>
+                            </div>
+
+                            <div class="alert alert-info mt-3">
+                                <strong>Tip:</strong> Use <code>:JJConfig</code> command to set up your credentials interactively.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vim Commands -->
+                <div id="vim-commands" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Commands Reference</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Command</th>
+                                            <th>Description</th>
+                                            <th>Example</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>:JJ</code></td>
+                                            <td>Paste entire buffer</td>
+                                            <td><code>:JJ</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>:.JJ</code></td>
+                                            <td>Paste current line</td>
+                                            <td><code>:.JJ</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>:5,10JJ</code></td>
+                                            <td>Paste lines 5-10</td>
+                                            <td><code>:5,10JJ</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>:'&lt;,'&gt;JJ</code></td>
+                                            <td>Paste visual selection</td>
+                                            <td>Select text, then <code>:JJ</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>:JJPub</code></td>
+                                            <td>Create public paste</td>
+                                            <td><code>:JJPub</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>:JJPriv</code></td>
+                                            <td>Create private paste</td>
+                                            <td><code>:JJPriv</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>:JJPaste</code></td>
+                                            <td>Paste with custom title</td>
+                                            <td><code>:JJPaste "My Custom Title"</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>:JJConfig</code></td>
+                                            <td>Configure credentials</td>
+                                            <td><code>:JJConfig</code></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vim Examples -->
+                <div id="vim-examples" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Usage Examples</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Quick Paste</h5>
+                                    <ol>
+                                        <li>Open a file in Vim</li>
+                                        <li>Type <code>:JJ</code></li>
+                                        <li>Press Enter</li>
+                                        <li>URL is copied to clipboard!</li>
+                                    </ol>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Paste Selection</h5>
+                                    <ol>
+                                        <li>Select text in visual mode</li>
+                                        <li>Type <code>:JJ</code></li>
+                                        <li>Press Enter</li>
+                                        <li>Only selected text is pasted</li>
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mt-4">Advanced Examples</h5>
+                            <div class="code-container">
+                                <pre><code class="language-vim">" Paste function definition (lines 10-20) as private
+:10,20JJPriv
+
+" Paste current line with custom title
+:.JJPaste "Debug output"
+
+" Paste entire buffer and make it public
+:%JJPub</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section id="troubleshooting" class="mb-5">
+                <h2>Troubleshooting</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h5>CLI Tool Issues</h5>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Command not found:</strong> Make sure Python 3 is installed and the script is in your PATH
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Connection error:</strong> Check the API URL with <code>jj --api-url {{ request.host_url.rstrip('/') }}/api</code>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Authentication failed:</strong> Use <code>jj login</code> to authenticate
+                        </div>
+
+                        <h5 class="mt-4">Vim Plugin Issues</h5>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Command not found:</strong> Make sure the plugin is installed in <code>~/.vim/plugin/</code>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Authentication failed:</strong> Check your username and password with <code>:JJConfig</code>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Network error:</strong> Verify the server URL is correct in your configuration
+                        </div>
+                        
+                        <h5 class="mt-4">Getting Help</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>CLI Tool:</strong></p>
+                                <div class="code-container">
+                                    <pre><code class="language-bash">jj --help
+jj paste --help</code></pre>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Vim Plugin:</strong></p>
+                                <div class="code-container">
+                                    <pre><code class="language-vim">:help jj-pastebin</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Download -->
+            <section class="mb-5">
+                <div class="card border-primary">
+                    <div class="card-body text-center">
+                        <h3><i class="fas fa-download me-2"></i>Get the Tools</h3>
+                        <p>Both CLI tools are included with JJ Pastebin.</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a href="https://github.com/jjasghar/jjs-pastebin" class="btn btn-primary">
+                                <i class="fab fa-github me-2"></i>View on GitHub
+                            </a>
+                            <a href="{{ url_for('web.api_docs') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-book me-2"></i>API Documentation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<style>
+.cli-tools-docs h2 {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.cli-tools-docs .card {
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.cli-tools-docs .nav-link {
+    padding: 0.25rem 0.5rem;
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+}
+
+.cli-tools-docs .nav-link:hover {
+    color: var(--primary-color);
+}
+
+.cli-tools-docs code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.875rem;
+}
+
+.cli-tools-docs pre code {
+    background: transparent;
+    padding: 0;
+}
+
+.cli-tools-docs .table th {
+    background-color: var(--background-color);
+    font-weight: 600;
+}
+</style>
+{% endblock %} 

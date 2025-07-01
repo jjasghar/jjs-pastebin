@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-3 mb-4">
+        <!-- User Info Card -->
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-user-circle fa-4x text-muted mb-3"></i>
+                <h4 class="mb-1">{{ user.username }}</h4>
+                {% if user.is_superuser %}
+                    <span class="badge bg-primary mb-2">Administrator</span>
+                {% endif %}
+                <p class="text-muted">{{ user.email }}</p>
+                
+                <div class="row text-center mt-3">
+                    <div class="col">
+                        <div class="fw-bold">{{ user.pastes.count() }}</div>
+                        <small class="text-muted">Pastes</small>
+                    </div>
+                    <div class="col">
+                        <div class="fw-bold">{{ user.pastes.filter_by(is_public=True).count() }}</div>
+                        <small class="text-muted">Public</small>
+                    </div>
+                    <div class="col">
+                        <div class="fw-bold">
+                            {% set ns = namespace(total=0) %}
+                            {% for paste in user.pastes %}
+                                {% set ns.total = ns.total + paste.views %}
+                            {% endfor %}
+                            {{ ns.total }}
+                        </div>
+                        <small class="text-muted">Views</small>
+                    </div>
+                </div>
+                
+                <div class="text-muted small mt-3">
+                    <i class="fas fa-calendar me-1"></i>
+                    Member since {{ user.created_at.strftime('%B %Y') }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="fas fa-clipboard-list me-2"></i>
+                {% if current_user.is_authenticated and current_user.id == user.id %}
+                    Your Pastes
+                {% else %}
+                    {{ user.username }}'s Public Pastes
+                {% endif %}
+            </h1>
+            {% if current_user.is_authenticated and current_user.id == user.id %}
+                <a href="{{ url_for('web.create_paste') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>New Paste
+                </a>
+            {% endif %}
+        </div>
+        
+        {% if pastes.items %}
+            <div class="row">
+                {% for paste in pastes.items %}
+                    <div class="col-md-6 mb-4">
+                        <div class="paste-card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{{ url_for('web.view_paste', unique_id=paste.unique_id) }}" 
+                                       class="text-decoration-none text-dark">
+                                        {{ paste.title }}
+                                    </a>
+                                </h5>
+                                
+                                <div class="d-flex align-items-center mb-2">
+                                    <a href="{{ url_for('web.language_filter', language=paste.language) }}" 
+                                       class="language-badge me-2 text-decoration-none">{{ paste.language }}</a>
+                                    <span class="stats-badge me-2">
+                                        <i class="fas fa-eye me-1"></i>{{ paste.views }}
+                                    </span>
+                                    {% if not paste.is_public %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-lock me-1"></i>Private
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="paste-meta mb-3">
+                                    <span class="text-muted small">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ paste.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                        {% if paste.updated_at != paste.created_at %}
+                                            <br><i class="fas fa-edit me-1"></i>
+                                            Updated {{ paste.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                <!-- Preview of content -->
+                                <div class="code-container mb-3">
+                                    <pre class="highlight mb-0"><code class="language-{{ paste.language }}">{{ paste.content[:150] }}{% if paste.content|length > 150 %}...{% endif %}</code></pre>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="{{ url_for('web.view_paste', unique_id=paste.unique_id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                        <a href="{{ url_for('web.raw_paste', unique_id=paste.unique_id) }}" 
+                                           class="btn btn-sm btn-outline-secondary ms-1">
+                                            <i class="fas fa-code me-1"></i>Raw
+                                        </a>
+                                    </div>
+                                    
+                                    {% if current_user.is_authenticated and (current_user.id == paste.user_id or current_user.is_superuser) %}
+                                        <div>
+                                            <a href="{{ url_for('web.edit_paste', unique_id=paste.unique_id) }}" 
+                                               class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if pastes.pages > 1 %}
+                <nav aria-label="User pastes pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if pastes.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('web.user_profile', username=user.username, page=pastes.prev_num) }}">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in pastes.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num != pastes.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('web.user_profile', username=user.username, page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if pastes.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('web.user_profile', username=user.username, page=pastes.next_num) }}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No pastes yet</h4>
+                {% if current_user.is_authenticated and current_user.id == user.id %}
+                    <p class="text-muted">Create your first paste to get started!</p>
+                    <a href="{{ url_for('web.create_paste') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Create Your First Paste
+                    </a>
+                {% else %}
+                    <p class="text-muted">{{ user.username }} hasn't created any public pastes yet.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <!-- Paste Header -->
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <h1 class="h3 mb-2">{{ paste.title }}</h1>
+                <div class="d-flex align-items-center flex-wrap">
+                    <a href="{{ url_for('web.language_filter', language=paste.language) }}" 
+                       class="language-badge me-2 text-decoration-none">{{ paste.language }}</a>
+                    <span class="stats-badge me-2">
+                        <i class="fas fa-eye me-1"></i>{{ paste.views }} views
+                    </span>
+                    {% if not paste.is_public %}
+                        <span class="badge bg-warning text-dark me-2">
+                            <i class="fas fa-lock me-1"></i>Private
+                        </span>
+                    {% endif %}
+                    <span class="text-muted small">
+                        Created {{ paste.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        {% if paste.updated_at != paste.created_at %}
+                            · Updated {{ paste.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group me-2" role="group">
+                    <a href="{{ url_for('web.raw_paste', unique_id=paste.unique_id) }}" 
+                       class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-code me-1"></i>Raw
+                    </a>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="copyToClipboard()">
+                        <i class="fas fa-copy me-1"></i>Copy
+                    </button>
+                    <a href="{{ url_for('web.raw_paste', unique_id=paste.unique_id) }}" 
+                       class="btn btn-outline-secondary btn-sm" download="{{ paste.title }}">
+                        <i class="fas fa-download me-1"></i>Download
+                    </a>
+                </div>
+                
+                {% if current_user.is_authenticated and (current_user.id == paste.user_id or current_user.is_superuser) %}
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('web.edit_paste', unique_id=paste.unique_id) }}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deletePaste()">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Author Information -->
+        {% if paste.author %}
+            <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                <i class="fas fa-user-circle fa-2x text-muted me-3"></i>
+                <div>
+                    <strong>
+                        <a href="{{ url_for('web.user_profile', username=paste.author.username) }}" 
+                           class="text-decoration-none">
+                            {{ paste.author.username }}
+                        </a>
+                        {% if paste.author.is_superuser %}
+                            <span class="badge bg-primary ms-1">Admin</span>
+                        {% endif %}
+                    </strong>
+                    <div class="text-muted small">
+                        Member since {{ paste.author.created_at.strftime('%B %Y') }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Code Content -->
+        <div class="code-container">
+            {{ highlighted_content|safe }}
+        </div>
+        
+        <!-- Share Section -->
+        <div class="mt-4 p-3 bg-light rounded">
+            <h6 class="mb-2">
+                <i class="fas fa-share-alt me-1"></i>Share this paste
+            </h6>
+            <div class="input-group">
+                <input type="text" class="form-control" id="shareUrl" 
+                       value="{{ request.url }}" readonly>
+                <button class="btn btn-outline-secondary" type="button" onclick="copyUrl()">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            
+            <div class="mt-2">
+                <small class="text-muted">
+                    <i class="fas fa-terminal me-1"></i>
+                    CLI: <code>jj view {{ paste.unique_id }}</code>
+                </small>
+            </div>
+        </div>
+        
+        <!-- Similar Pastes -->
+        {% if paste.author and paste.author.pastes.count() > 1 %}
+            <div class="mt-4">
+                <h6 class="mb-3">
+                    <i class="fas fa-list me-1"></i>
+                    More from {{ paste.author.username }}
+                </h6>
+                <div class="row">
+                    {% for similar_paste in paste.author.pastes.filter_by(is_public=True).filter(paste.id != similar_paste.id).limit(3) %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card card-body">
+                                <h6 class="card-title">
+                                    <a href="{{ url_for('web.view_paste', unique_id=similar_paste.unique_id) }}" 
+                                       class="text-decoration-none">
+                                        {{ similar_paste.title }}
+                                    </a>
+                                </h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="language-badge">{{ similar_paste.language }}</span>
+                                    <small class="text-muted">{{ similar_paste.created_at.strftime('%b %d') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+{% if current_user.is_authenticated and (current_user.id == paste.user_id or current_user.is_superuser) %}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Paste</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<strong>{{ paste.title }}</strong>"?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('web.delete_paste', unique_id=paste.unique_id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function copyToClipboard() {
+        // Get the code content
+        const codeElement = document.querySelector('.highlight code');
+        const text = codeElement ? codeElement.textContent : document.querySelector('pre').textContent;
+        
+        navigator.clipboard.writeText(text).then(function() {
+            // Show feedback
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-secondary');
+            
+            setTimeout(function() {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        }).catch(function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+    
+    function copyUrl() {
+        const urlInput = document.getElementById('shareUrl');
+        urlInput.select();
+        urlInput.setSelectionRange(0, 99999);
+        
+        navigator.clipboard.writeText(urlInput.value).then(function() {
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-secondary');
+            
+            setTimeout(function() {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        });
+    }
+    
+    function deletePaste() {
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+</script>
+{% endblock %} 

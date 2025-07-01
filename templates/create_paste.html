@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="fas fa-plus me-2"></i>Create New Paste
+            </h1>
+        </div>
+        
+        <form method="POST" id="pasteForm">
+            {{ form.hidden_tag() }}
+            
+            <div class="paste-card">
+                <div class="card-body">
+                    <!-- Title -->
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.title.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Language and Visibility -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.language.label(class="form-label") }}
+                            {{ form.language(class="form-select") }}
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check">
+                                {{ form.is_public(class="form-check-input") }}
+                                {{ form.is_public.label(class="form-check-label") }}
+                                <small class="form-text text-muted d-block">
+                                    Public pastes are visible to everyone
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {{ form.content(class="form-control font-monospace" + (" is-invalid" if form.content.errors else "")) }}
+                        {% if form.content.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.content.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Tip: Drag and drop a file here or paste your code directly
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('web.index') }}" class="btn btn-outline-secondary ms-2">
+                                Cancel
+                            </a>
+                        </div>
+                        
+                        <div class="text-muted small">
+                            <i class="fas fa-keyboard me-1"></i>
+                            <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to submit
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- CLI Instructions -->
+        <div class="mt-4 p-3 bg-light rounded">
+            <h6 class="mb-2">
+                <i class="fas fa-terminal me-1"></i>
+                Use the CLI tool
+            </h6>
+            <p class="mb-2 small text-muted">
+                Upload files directly from the command line:
+            </p>
+            <code class="d-block bg-dark text-light p-2 rounded">
+                # Install and upload a file<br>
+                pip install -e .<br>
+                jj paste myfile.py
+            </code>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-detect language based on content
+    document.getElementById('content').addEventListener('input', function() {
+        const content = this.value.trim();
+        const languageSelect = document.getElementById('language');
+        
+        if (content && languageSelect.value === 'text') {
+            // Simple language detection based on common patterns
+            if (content.includes('def ') || content.includes('import ') || content.includes('from ')) {
+                languageSelect.value = 'python';
+            } else if (content.includes('function ') || content.includes('const ') || content.includes('=>')) {
+                languageSelect.value = 'javascript';
+            } else if (content.includes('<html') || content.includes('<!DOCTYPE')) {
+                languageSelect.value = 'html';
+            } else if (content.includes('SELECT ') || content.includes('INSERT ')) {
+                languageSelect.value = 'sql';
+            }
+        }
+    });
+    
+    // Keyboard shortcut for submission
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            document.getElementById('pasteForm').submit();
+        }
+    });
+    
+    // Drag and drop file handling
+    const contentArea = document.getElementById('content');
+    const titleField = document.getElementById('title');
+    
+    contentArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('border-primary');
+    });
+    
+    contentArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary');
+    });
+    
+    contentArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                contentArea.value = e.target.result;
+                
+                // Set title to filename if empty
+                if (!titleField.value.trim()) {
+                    titleField.value = file.name;
+                }
+                
+                // Auto-detect language from file extension
+                const ext = file.name.split('.').pop().toLowerCase();
+                const languageMap = {
+                    'py': 'python',
+                    'js': 'javascript',
+                    'ts': 'typescript',
+                    'html': 'html',
+                    'css': 'css',
+                    'json': 'json',
+                    'sql': 'sql',
+                    'sh': 'bash',
+                    'c': 'c',
+                    'cpp': 'cpp',
+                    'java': 'java',
+                    'php': 'php',
+                    'rb': 'ruby',
+                    'go': 'go',
+                    'rs': 'rust',
+                    'yml': 'yaml',
+                    'yaml': 'yaml',
+                    'md': 'markdown'
+                };
+                
+                if (languageMap[ext]) {
+                    document.getElementById('language').value = languageMap[ext];
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+    });
+</script>
+{% endblock %} 

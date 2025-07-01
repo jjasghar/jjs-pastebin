@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if title %}
+            {{ title }} - JJ Pastebin
+        {% else %}
+            JJ Pastebin
+        {% endif %}
+    </title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0366d6;
+            --secondary-color: #586069;
+            --border-color: #e1e4e8;
+            --background-color: #f6f8fa;
+            --text-color: #24292e;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-color);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color) !important;
+        }
+        
+        .paste-card {
+            border-radius: 6px;
+            background: white;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .paste-card:hover {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        
+        .paste-meta {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+        
+        .code-container {
+            background: #f6f8fa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        
+        .highlight {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.45;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0256cc;
+            border-color: #0256cc;
+        }
+        
+        .alert {
+            border-radius: 6px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 6px;
+        }
+        
+        .language-badge {
+            background-color: #f1f8ff;
+            color: #0366d6;
+            border: 1px solid #c8e1ff;
+            border-radius: 12px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .language-badge:hover {
+            background-color: #0366d6;
+            color: white;
+            border-color: #0366d6;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(3, 102, 214, 0.2);
+        }
+        
+        .stats-badge {
+            background-color: var(--background-color);
+            color: var(--secondary-color);
+            border-radius: 12px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Pygments syntax highlighting styles */
+        .highlight .hll { background-color: #ffffcc }
+        .highlight { background: #f8f8f8; }
+        .highlight .c { color: #8f5902; font-style: italic } /* Comment */
+        .highlight .err { color: #a40000; border: 1px solid #ef2929 } /* Error */
+        .highlight .g { color: #000000 } /* Generic */
+        .highlight .k { color: #204a87; font-weight: bold } /* Keyword */
+        .highlight .l { color: #000000 } /* Literal */
+        .highlight .n { color: #000000 } /* Name */
+        .highlight .o { color: #ce5c00; font-weight: bold } /* Operator */
+        .highlight .x { color: #000000 } /* Other */
+        .highlight .p { color: #000000; font-weight: bold } /* Punctuation */
+        .highlight .ch { color: #8f5902; font-style: italic } /* Comment.Hashbang */
+        .highlight .cm { color: #8f5902; font-style: italic } /* Comment.Multiline */
+        .highlight .cp { color: #8f5902; font-style: italic } /* Comment.Preproc */
+        .highlight .cpf { color: #8f5902; font-style: italic } /* Comment.PreprocFile */
+        .highlight .c1 { color: #8f5902; font-style: italic } /* Comment.Single */
+        .highlight .cs { color: #8f5902; font-style: italic } /* Comment.Special */
+        .highlight .gd { color: #a40000 } /* Generic.Deleted */
+        .highlight .ge { color: #000000; font-style: italic } /* Generic.Emph */
+        .highlight .gr { color: #ef2929 } /* Generic.Error */
+        .highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+        .highlight .gi { color: #00A000 } /* Generic.Inserted */
+        .highlight .go { color: #000000; font-style: italic } /* Generic.Output */
+        .highlight .gp { color: #8f5902 } /* Generic.Prompt */
+        .highlight .gs { color: #000000; font-weight: bold } /* Generic.Strong */
+        .highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+        .highlight .gt { color: #a40000; font-weight: bold } /* Generic.Traceback */
+        .highlight .kc { color: #204a87; font-weight: bold } /* Keyword.Constant */
+        .highlight .kd { color: #204a87; font-weight: bold } /* Keyword.Declaration */
+        .highlight .kn { color: #204a87; font-weight: bold } /* Keyword.Namespace */
+        .highlight .kp { color: #204a87; font-weight: bold } /* Keyword.Pseudo */
+        .highlight .kr { color: #204a87; font-weight: bold } /* Keyword.Reserved */
+        .highlight .kt { color: #204a87; font-weight: bold } /* Keyword.Type */
+        .highlight .ld { color: #000000 } /* Literal.Date */
+        .highlight .m { color: #0000cf; font-weight: bold } /* Literal.Number */
+        .highlight .s { color: #4e9a06 } /* Literal.String */
+        .highlight .na { color: #c4a000 } /* Name.Attribute */
+        .highlight .nb { color: #204a87 } /* Name.Builtin */
+        .highlight .nc { color: #000000 } /* Name.Class */
+        .highlight .no { color: #000000 } /* Name.Constant */
+        .highlight .nd { color: #5c35cc; font-weight: bold } /* Name.Decorator */
+        .highlight .ni { color: #ce5c00 } /* Name.Entity */
+        .highlight .ne { color: #cc0000; font-weight: bold } /* Name.Exception */
+        .highlight .nf { color: #000000 } /* Name.Function */
+        .highlight .nl { color: #f57900 } /* Name.Label */
+        .highlight .nn { color: #000000 } /* Name.Namespace */
+        .highlight .nx { color: #000000 } /* Name.Other */
+        .highlight .py { color: #000000 } /* Name.Property */
+        .highlight .nt { color: #204a87; font-weight: bold } /* Name.Tag */
+        .highlight .nv { color: #000000 } /* Name.Variable */
+        .highlight .ow { color: #204a87; font-weight: bold } /* Operator.Word */
+        .highlight .pm { color: #000000; font-weight: bold } /* Punctuation.Marker */
+        .highlight .w { color: #f8f8f8; text-decoration: underline } /* Text.Whitespace */
+        .highlight .mb { color: #0000cf; font-weight: bold } /* Literal.Number.Bin */
+        .highlight .mf { color: #0000cf; font-weight: bold } /* Literal.Number.Float */
+        .highlight .mh { color: #0000cf; font-weight: bold } /* Literal.Number.Hex */
+        .highlight .mi { color: #0000cf; font-weight: bold } /* Literal.Number.Integer */
+        .highlight .mo { color: #0000cf; font-weight: bold } /* Literal.Number.Oct */
+        .highlight .sa { color: #4e9a06 } /* Literal.String.Affix */
+        .highlight .sb { color: #4e9a06 } /* Literal.String.Backtick */
+        .highlight .sc { color: #4e9a06 } /* Literal.String.Char */
+        .highlight .dl { color: #4e9a06 } /* Literal.String.Delimiter */
+        .highlight .sd { color: #8f5902; font-style: italic } /* Literal.String.Doc */
+        .highlight .s2 { color: #4e9a06 } /* Literal.String.Double */
+        .highlight .se { color: #4e9a06 } /* Literal.String.Escape */
+        .highlight .sh { color: #4e9a06 } /* Literal.String.Heredoc */
+        .highlight .si { color: #4e9a06 } /* Literal.String.Interpol */
+        .highlight .sx { color: #4e9a06 } /* Literal.String.Other */
+        .highlight .sr { color: #4e9a06 } /* Literal.String.Regex */
+        .highlight .s1 { color: #4e9a06 } /* Literal.String.Single */
+        .highlight .ss { color: #4e9a06 } /* Literal.String.Symbol */
+        .highlight .bp { color: #3465a4 } /* Name.Builtin.Pseudo */
+        .highlight .fm { color: #000000 } /* Name.Function.Magic */
+        .highlight .vc { color: #000000 } /* Name.Variable.Class */
+        .highlight .vg { color: #000000 } /* Name.Variable.Global */
+        .highlight .vi { color: #000000 } /* Name.Variable.Instance */
+        .highlight .vm { color: #000000 } /* Name.Variable.Magic */
+        .highlight .il { color: #0000cf; font-weight: bold } /* Literal.Number.Integer.Long */
+        
+        /* Line numbers */
+        .highlight .linenos { 
+            color: #aaa; 
+            background-color: #f0f0f0; 
+            padding-right: 1em; 
+            user-select: none; 
+            border-right: 1px solid #ddd;
+        }
+
+        /* Paste list styles */
+        .paste-list {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+        
+        .paste-item {
+            padding: 1rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .paste-item:hover {
+            background-color: var(--background-color);
+        }
+        
+        .paste-item:last-child {
+            border-bottom: none !important;
+        }
+        
+        .content-preview {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            max-height: 2.8rem;
+            overflow: hidden;
+        }
+        
+        .code-preview-container {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin-top: 0.25rem;
+            overflow: hidden;
+        }
+        
+        /* Highlight preview styles */
+        .highlight-preview {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            background: transparent;
+            margin: 0;
+            padding: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Pygments syntax highlighting for previews */
+        .highlight-preview .k { color: #204a87; font-weight: bold } /* Keyword */
+        .highlight-preview .s { color: #4e9a06 } /* String */
+        .highlight-preview .s2 { color: #4e9a06 } /* String.Double */
+        .highlight-preview .s1 { color: #4e9a06 } /* String.Single */
+        .highlight-preview .c { color: #8f5902; font-style: italic } /* Comment */
+        .highlight-preview .c1 { color: #8f5902; font-style: italic } /* Comment.Single */
+        .highlight-preview .cm { color: #8f5902; font-style: italic } /* Comment.Multiline */
+        .highlight-preview .m { color: #0000cf; font-weight: bold } /* Number */
+        .highlight-preview .mi { color: #0000cf; font-weight: bold } /* Number.Integer */
+        .highlight-preview .mf { color: #0000cf; font-weight: bold } /* Number.Float */
+        .highlight-preview .nf { color: #000000 } /* Name.Function */
+        .highlight-preview .nb { color: #204a87 } /* Name.Builtin */
+        .highlight-preview .o { color: #ce5c00; font-weight: bold } /* Operator */
+        .highlight-preview .p { color: #000000; font-weight: bold } /* Punctuation */
+        .highlight-preview .kd { color: #204a87; font-weight: bold } /* Keyword.Declaration */
+        .highlight-preview .nx { color: #000000 } /* Name.Other */
+        .highlight-preview .nt { color: #204a87; font-weight: bold } /* Name.Tag */
+        .highlight-preview .na { color: #c4a000 } /* Name.Attribute */
+        
+        .paste-actions .btn-group-vertical .btn {
+            border-radius: 4px;
+            margin-bottom: 2px;
+        }
+        
+        .paste-actions .btn-group-vertical .btn:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('web.index') }}">
+                <i class="fas fa-code me-2"></i>JJ Pastebin
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('web.index') }}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('web.create_paste') }}">
+                            <i class="fas fa-plus me-1"></i>New Paste
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('web.user_profile', username=current_user.username) }}">
+                                    <i class="fas fa-user me-2"></i>My Profile
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.register') }}">
+                                <i class="fas fa-user-plus me-1"></i>Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="container mt-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top mt-5 py-4 text-center text-muted">
+        <div class="container">
+            <p class="mb-0">
+                JJ Pastebin - Share code snippets easily
+                <span class="mx-2">|</span>
+                <a href="{{ url_for('web.api_docs') }}" class="text-decoration-none">API Docs</a>
+                <span class="mx-2">|</span>
+                <a href="{{ url_for('web.cli_tools_docs') }}" class="text-decoration-none">CLI Tools & Vim Plugin</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

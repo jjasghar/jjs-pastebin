@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI Tools & Vim Plugin - JJ Pastebin</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0366d6;
+            --secondary-color: #586069;
+            --border-color: #e1e4e8;
+            --background-color: #f6f8fa;
+            --text-color: #24292e;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-color);
+        }
+        
+        .cli-docs h2 {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cli-docs .card {
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .cli-docs .nav-link {
+            padding: 0.25rem 0.5rem;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+        
+        .cli-docs .nav-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .cli-docs code {
+            background-color: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.875rem;
+        }
+        
+        .cli-docs pre code {
+            background: transparent;
+            padding: 0;
+        }
+        
+        .code-container {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        
+        .command-card {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .command-name {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="fas fa-code me-2"></i>JJ Pastebin
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-docs.html">API Docs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="cli-tools.html">CLI Tools</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/jjasghar/jjs-pastebin" target="_blank">
+                            <i class="fab fa-github me-1"></i>GitHub
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-3">
+                <!-- Table of Contents -->
+                <div class="sticky-top" style="top: 20px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-list me-2"></i>Table of Contents</h6>
+                        </div>
+                        <div class="card-body">
+                            <nav class="nav flex-column">
+                                <a class="nav-link" href="#overview">Overview</a>
+                                <a class="nav-link" href="#python-cli">Python CLI Tool</a>
+                                <a class="nav-link ms-3" href="#cli-installation">Installation</a>
+                                <a class="nav-link ms-3" href="#cli-commands">Commands</a>
+                                <a class="nav-link ms-3" href="#cli-examples">Examples</a>
+                                <a class="nav-link" href="#vim-plugin">Vim Plugin</a>
+                                <a class="nav-link ms-3" href="#vim-installation">Installation</a>
+                                <a class="nav-link ms-3" href="#vim-commands">Commands</a>
+                                <a class="nav-link ms-3" href="#vim-configuration">Configuration</a>
+                                <a class="nav-link ms-3" href="#vim-examples">Examples</a>
+                                <a class="nav-link" href="#troubleshooting">Troubleshooting</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-9">
+                <div class="cli-docs">
+                    <!-- Header -->
+                    <div class="mb-5">
+                        <h1 class="display-4 mb-3">
+                            <i class="fas fa-terminal me-3"></i>CLI Tools & Vim Plugin
+                        </h1>
+                        <p class="lead text-muted">
+                            Command-line tools and editor integrations for seamless code sharing
+                        </p>
+                    </div>
+
+                    <!-- Overview -->
+                    <section id="overview" class="mb-5">
+                        <h2 class="h3 mb-3">Overview</h2>
+                        <div class="card">
+                            <div class="card-body">
+                                <p>JJ Pastebin provides two powerful command-line tools to integrate code sharing into your development workflow:</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5><i class="fab fa-python me-2"></i>Python CLI Tool</h5>
+                                        <p>A standalone command-line interface for creating, managing, and sharing pastes directly from your terminal.</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5><i class="fas fa-edit me-2"></i>Vim Plugin</h5>
+                                        <p>A comprehensive Vim plugin that integrates seamlessly with your editor for instant code sharing.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <strong>Quick Start:</strong> Both tools support authentication, multiple paste formats, and automatic language detection.
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Python CLI Tool -->
+                    <section id="python-cli" class="mb-5">
+                        <h2 class="h3 mb-3">Python CLI Tool</h2>
+                        
+                        <!-- CLI Installation -->
+                        <div id="cli-installation" class="mb-4">
+                            <h4>Installation</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>Install the CLI tool using pip from the project directory:</p>
+                                    
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Install from project directory
+cd jjs-pastebin
+pip install -e .
+
+# Or install system-wide (optional)
+sudo pip install -e .
+sudo ln -sf $(which jj) /usr/local/bin/jj</code></pre>
+                                    </div>
+                                    
+                                    <div class="alert alert-info mt-3">
+                                        <strong>Note:</strong> The CLI tool requires Python 3.8+ and the requests library.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CLI Commands -->
+                        <div id="cli-commands" class="mb-4">
+                            <h4>Commands</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="command-card">
+                                        <div class="command-name">jj paste [file]</div>
+                                        <p class="mb-1">Create a new paste from a file or stdin</p>
+                                        <small class="text-muted">Supports: file input, stdin, language detection</small>
+                                    </div>
+                                    
+                                    <div class="command-card">
+                                        <div class="command-name">jj list</div>
+                                        <p class="mb-1">List your recent pastes</p>
+                                        <small class="text-muted">Shows: paste ID, title, language, creation date</small>
+                                    </div>
+                                    
+                                    <div class="command-card">
+                                        <div class="command-name">jj get [paste-id]</div>
+                                        <p class="mb-1">Retrieve a specific paste</p>
+                                        <small class="text-muted">Options: raw output, syntax highlighting</small>
+                                    </div>
+                                    
+                                    <div class="command-card">
+                                        <div class="command-name">jj delete [paste-id]</div>
+                                        <p class="mb-1">Delete a paste (requires authentication)</p>
+                                        <small class="text-muted">Note: Only paste owners can delete</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CLI Examples -->
+                        <div id="cli-examples" class="mb-4">
+                            <h4>Examples</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Basic File Upload</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Upload a Python file
+jj paste script.py
+
+# Upload with custom title
+jj paste script.py --title "My Script"
+
+# Create private paste
+jj paste script.py --private</code></pre>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Pipe Input</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Pipe command output
+ls -la | jj paste -
+
+# Pipe with language specification
+echo "console.log('hello');" | jj paste - --language javascript
+
+# Pipe with title
+cat ~/.bashrc | jj paste - --title "My Bash Config"</code></pre>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Authentication</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Set credentials (one-time setup)
+jj config --server http://localhost:8000 --username myuser --password mypass
+
+# Or use environment variables
+export JJ_SERVER=http://localhost:8000
+export JJ_USERNAME=myuser
+export JJ_PASSWORD=mypass</code></pre>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Paste Management</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># List your pastes
+jj list
+
+# Get paste content
+jj get abc123
+
+# Get raw paste (no formatting)
+jj get abc123 --raw
+
+# Delete a paste
+jj delete abc123</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Vim Plugin -->
+                    <section id="vim-plugin" class="mb-5">
+                        <h2 class="h3 mb-3">Vim Plugin</h2>
+                        
+                        <!-- Vim Installation -->
+                        <div id="vim-installation" class="mb-4">
+                            <h4>Installation</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>Install the Vim plugin using the provided installation script:</p>
+                                    
+                                    <div class="code-container">
+                                        <pre><code class="language-bash"># Navigate to the vim-plugin directory
+cd jjs-pastebin/vim-plugin
+
+# Run the installation script
+./install.sh
+
+# Or install manually
+cp jj-pastebin.vim ~/.vim/plugin/
+cp jj-pastebin.txt ~/.vim/doc/
+vim -c 'helptags ~/.vim/doc' -c 'quit'</code></pre>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning mt-3">
+                                        <strong>Requirements:</strong> Vim 7.0+ with Python support, curl, and clipboard utility (pbcopy/xclip/xsel).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vim Commands -->
+                        <div id="vim-commands" class="mb-4">
+                            <h4>Commands</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="command-card">
+                                        <div class="command-name">:JJ</div>
+                                        <p class="mb-1">Create a public paste from current buffer or selection</p>
+                                        <small class="text-muted">Usage: :JJ (whole buffer), :'&lt;,'&gt;JJ (selection), :.JJ (current line)</small>
+                                    </div>
+                                    
+                                    <div class="command-card">
+                                        <div class="command-name">:JJPub</div>
+                                        <p class="mb-1">Create a public paste (explicit)</p>
+                                        <small class="text-muted">Same as :JJ but explicitly public</small>
+                                    </div>
+                                    
+                                    <div class="command-card">
+                                        <div class="command-name">:JJPriv</div>
+                                        <p class="mb-1">Create a private paste</p>
+                                        <small class="text-muted">Requires authentication</small>
+                                    </div>
+                                    
+                                    <div class="command-card">
+                                        <div class="command-name">:JJPaste</div>
+                                        <p class="mb-1">Generic paste command with options</p>
+                                        <small class="text-muted">Most flexible command with full option support</small>
+                                    </div>
+                                    
+                                    <div class="command-card">
+                                        <div class="command-name">:JJConfig</div>
+                                        <p class="mb-1">Configure server settings</p>
+                                        <small class="text-muted">Set server URL, username, and password</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vim Configuration -->
+                        <div id="vim-configuration" class="mb-4">
+                            <h4>Configuration</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>Add these settings to your <code>~/.vimrc</code> to customize the plugin:</p>
+                                    
+                                    <div class="code-container">
+                                        <pre><code class="language-vim">" Server configuration
+let g:jj_pastebin_server = 'http://localhost:8000'
+let g:jj_pastebin_username = 'your-username'
+let g:jj_pastebin_password = 'your-password'
+
+" Default settings
+let g:jj_pastebin_public = 1        " 1 for public, 0 for private
+let g:jj_pastebin_copy_url = 1      " Copy URL to clipboard
+let g:jj_pastebin_open_browser = 0  " Open paste in browser
+
+" Custom keybindings
+nnoremap &lt;leader&gt;jp :JJ&lt;CR&gt;
+vnoremap &lt;leader&gt;jp :JJ&lt;CR&gt;
+nnoremap &lt;leader&gt;jpr :JJPriv&lt;CR&gt;
+vnoremap &lt;leader&gt;jpr :JJPriv&lt;CR&gt;</code></pre>
+                                    </div>
+                                    
+                                    <div class="alert alert-info mt-3">
+                                        <strong>Tip:</strong> You can also configure settings interactively using <code>:JJConfig</code>.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vim Examples -->
+                        <div id="vim-examples" class="mb-4">
+                            <h4>Examples</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Basic Usage</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-vim">" Paste entire buffer
+:JJ
+
+" Paste current line
+:.JJ
+
+" Paste selection (visual mode)
+:'&lt;,'&gt;JJ
+
+" Paste lines 10-20
+:10,20JJ</code></pre>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Advanced Usage</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-vim">" Create private paste
+:JJPriv
+
+" Create paste with custom title
+:JJPaste title="My Custom Title"
+
+" Create paste with specific language
+:JJPaste language="python"
+
+" Create private paste with title
+:JJPaste title="Secret Code" private=1</code></pre>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Configuration</h5>
+                                    <div class="code-container">
+                                        <pre><code class="language-vim">" Configure server settings
+:JJConfig
+
+" Check current configuration
+:echo g:jj_pastebin_server
+:echo g:jj_pastebin_username</code></pre>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Language Support</h5>
+                                    <p>The plugin automatically detects language based on Vim's filetype. Supported languages include:</p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled">
+                                                <li><code>Python</code> → python</li>
+                                                <li><code>JavaScript</code> → javascript</li>
+                                                <li><code>HTML</code> → html</li>
+                                                <li><code>CSS</code> → css</li>
+                                                <li><code>Bash</code> → bash</li>
+                                                <li><code>JSON</code> → json</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled">
+                                                <li><code>C/C++</code> → c/cpp</li>
+                                                <li><code>Java</code> → java</li>
+                                                <li><code>PHP</code> → php</li>
+                                                <li><code>Ruby</code> → ruby</li>
+                                                <li><code>Go</code> → go</li>
+                                                <li>And 30+ more...</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Troubleshooting -->
+                    <section id="troubleshooting" class="mb-5">
+                        <h2 class="h3 mb-3">Troubleshooting</h2>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>Common Issues</h5>
+                                
+                                <div class="accordion" id="troubleshootingAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                                CLI Tool: "Command not found"
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                                            <div class="accordion-body">
+                                                <p>Ensure the CLI tool is properly installed:</p>
+                                                <div class="code-container">
+                                                    <pre><code class="language-bash"># Check if jj is in your PATH
+which jj
+
+# If not found, reinstall
+pip install -e .
+
+# Or add to PATH manually
+export PATH=$PATH:~/.local/bin</code></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                                Vim Plugin: Authentication Issues
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                                            <div class="accordion-body">
+                                                <p>Check your authentication settings:</p>
+                                                <div class="code-container">
+                                                    <pre><code class="language-vim">" Check current settings
+:echo g:jj_pastebin_server
+:echo g:jj_pastebin_username
+
+" Reconfigure if needed
+:JJConfig
+
+" Or set manually in .vimrc
+let g:jj_pastebin_username = 'correct-username'</code></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                                Clipboard Issues
+                                            </button>
+                                        </h2>
+                                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                                            <div class="accordion-body">
+                                                <p>Install clipboard utilities for your system:</p>
+                                                <div class="code-container">
+                                                    <pre><code class="language-bash"># macOS (usually pre-installed)
+# pbcopy is available by default
+
+# Linux (X11)
+sudo apt-get install xclip
+# or
+sudo apt-get install xsel
+
+# Linux (Wayland)
+sudo apt-get install wl-clipboard</code></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="mt-4">Getting Help</h5>
+                                <p>For additional help:</p>
+                                <ul>
+                                    <li>Check the <a href="https://github.com/jjasghar/jjs-pastebin" target="_blank">GitHub repository</a> for issues and documentation</li>
+                                    <li>View Vim help: <code>:help jj-pastebin</code></li>
+                                    <li>Check CLI help: <code>jj --help</code></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">
+                <a href="index.html" class="text-light text-decoration-none">JJ Pastebin</a> - 
+                <a href="api-docs.html" class="text-light text-decoration-none">API Docs</a> - 
+                <a href="cli-tools.html" class="text-light text-decoration-none">CLI Tools</a> - 
+                <a href="https://github.com/jjasghar/jjs-pastebin" target="_blank">GitHub</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-vim.min.js"></script>
+    
+    <!-- Smooth scrolling -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

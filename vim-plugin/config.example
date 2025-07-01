@@ -1,0 +1,31 @@
+" JJ Pastebin Vim Plugin Configuration
+" Add these lines to your ~/.vimrc file
+
+" Configure your pastebin server URL
+let g:jj_pastebin_url = 'http://localhost:8000'
+
+" Optional: Set your credentials for authenticated pastes
+" (You can also paste anonymously without these)
+let g:jj_pastebin_username = 'admin'
+let g:jj_pastebin_password = 'admin123'
+
+" Optional: Make pastes private by default (0 = public, 1 = private)
+let g:jj_pastebin_private_default = 0
+
+" Optional: Automatically copy paste URL to clipboard (1 = yes, 0 = no)
+let g:jj_pastebin_copy_url = 1
+
+" Optional: Create key mappings for quick access
+" Paste entire buffer with F5
+nnoremap <F5> :JJ<CR>
+
+" Paste selection with F6
+vnoremap <F6> :JJ<CR>
+
+" Create private paste with leader+p
+nnoremap <leader>p :JJPriv<CR>
+vnoremap <leader>p :JJPriv<CR>
+
+" Create public paste with leader+P
+nnoremap <leader>P :JJPub<CR>
+vnoremap <leader>P :JJPub<CR> 

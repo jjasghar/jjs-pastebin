@@ -1,0 +1,159 @@
+*jj-pastebin.txt*  JJ Pastebin Vim Plugin                        *jj-pastebin*
+
+                    JJ PASTEBIN VIM PLUGIN
+                         Version 1.0
+
+==============================================================================
+CONTENTS                                           *jj-pastebin-contents*
+
+    1. Introduction ..................... |jj-pastebin-intro|
+    2. Installation ..................... |jj-pastebin-install|
+    3. Configuration .................... |jj-pastebin-config|
+    4. Usage ............................ |jj-pastebin-usage|
+    5. Commands ......................... |jj-pastebin-commands|
+    6. Examples ......................... |jj-pastebin-examples|
+    7. License .......................... |jj-pastebin-license|
+
+==============================================================================
+1. Introduction                                      *jj-pastebin-intro*
+
+JJ Pastebin is a Vim plugin that allows you to easily paste code snippets
+from Vim directly to your JJ Pastebin service. It supports authentication,
+syntax highlighting, and various paste options.
+
+Features:
+- Paste entire buffers or selected lines
+- Automatic language detection based on filetype
+- Authentication support
+- Public/private paste options
+- Automatic URL copying to clipboard
+- Comprehensive language mapping
+
+==============================================================================
+2. Installation                                    *jj-pastebin-install*
+
+Copy the plugin file to your Vim plugin directory:
+
+    ~/.vim/plugin/jj-pastebin.vim
+
+Or use a plugin manager like vim-plug:
+>
+    Plug 'path/to/jj-pastebin'
+<
+
+==============================================================================
+3. Configuration                                   *jj-pastebin-config*
+
+Add these settings to your .vimrc file:
+
+*g:jj_pastebin_url*
+    Base URL of your JJ Pastebin service
+    Default: 'http://localhost:8000'
+>
+    let g:jj_pastebin_url = 'https://your-pastebin.com'
+<
+
+*g:jj_pastebin_username*
+    Your username for authentication (optional)
+    Default: ''
+>
+    let g:jj_pastebin_username = 'your_username'
+<
+
+*g:jj_pastebin_password*
+    Your password for authentication (optional)
+    Default: ''
+>
+    let g:jj_pastebin_password = 'your_password'
+<
+
+*g:jj_pastebin_private_default*
+    Whether pastes should be private by default
+    Default: 0 (public)
+>
+    let g:jj_pastebin_private_default = 1
+<
+
+*g:jj_pastebin_copy_url*
+    Whether to copy the paste URL to clipboard
+    Default: 1 (yes)
+>
+    let g:jj_pastebin_copy_url = 0
+<
+
+==============================================================================
+4. Usage                                           *jj-pastebin-usage*
+
+Basic usage:
+- `:JJ` - Paste entire buffer
+- `:5,10JJ` - Paste lines 5-10
+- `:'<,'>JJ` - Paste visual selection
+- `:JJ My Title` - Paste with custom title
+
+The plugin will:
+1. Detect the file type for syntax highlighting
+2. Authenticate if credentials are provided
+3. Create the paste on your server
+4. Display the paste URL
+5. Copy URL to clipboard (if enabled)
+
+==============================================================================
+5. Commands                                      *jj-pastebin-commands*
+
+*:JJ* [title]
+    Paste content using default privacy setting
+
+*:JJPaste* [title]
+    Same as :JJ
+
+*:JJPub* [title]
+    Create a public paste
+
+*:JJPriv* [title]
+    Create a private paste
+
+*:JJPastePublic* [title]
+    Create a public paste (long form)
+
+*:JJPastePrivate* [title]
+    Create a private paste (long form)
+
+*:JJConfig*
+    Show current configuration and help
+
+All commands accept an optional title parameter and support line ranges.
+
+==============================================================================
+6. Examples                                      *jj-pastebin-examples*
+
+Paste entire file:
+>
+    :JJ
+<
+
+Paste lines 10-20 with title:
+>
+    :10,20JJ Bug reproduction code
+<
+
+Paste visual selection as private:
+>
+    :'<,'>JJPriv Secret code
+<
+
+Paste current line:
+>
+    :.JJ
+<
+
+Check configuration:
+>
+    :JJConfig
+<
+
+==============================================================================
+7. License                                       *jj-pastebin-license*
+
+This plugin is provided as-is for use with JJ Pastebin service.
+
+vim:tw=78:ts=8:ft=help:norl: 
