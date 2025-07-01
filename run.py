@@ -14,8 +14,9 @@ def deploy():
     # Create database tables
     db.create_all()
 
-    # Create a default superuser if none exists
-    if not User.query.filter_by(is_superuser=True).first():
+    # Create a default admin user if it doesn't exist
+    admin_user = User.query.filter_by(username="admin").first()
+    if not admin_user:
         admin = User(
             username="admin", email="admin@example.com", is_superuser=True
         )
@@ -26,6 +27,8 @@ def deploy():
         print("Username: admin")
         print("Password: admin123")
         print("Please change this password after first login!")
+    else:
+        print("Admin user already exists, skipping creation.")
 
 
 # Create app instance for Gunicorn
