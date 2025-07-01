@@ -21,9 +21,9 @@ def token_required(f):
                     token = auth_header.split(" ")[1]
                 elif auth_header.startswith("Basic "):
                     # Basic auth: base64(username:password)
-                    credentials = base64.b64decode(
-                        auth_header.split(" ")[1]
-                    ).decode("utf-8")
+                    credentials = base64.b64decode(auth_header.split(" ")[1]).decode(
+                        "utf-8"
+                    )
                     username, password = credentials.split(":", 1)
                     user = User.query.filter_by(username=username).first()
                     if user and user.check_password(password):

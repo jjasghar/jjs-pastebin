@@ -99,12 +99,6 @@ See the [vim-plugin/README.md](vim-plugin/README.md) for detailed documentation.
 
 5. **Visit the application:**
    Open your browser to `http://localhost:5000`
-   
-   **Note:** On macOS, port 5000 may conflict with AirPlay. If you encounter a "port in use" error, use:
-   ```bash
-   PORT=8000 python run.py
-   ```
-   Then visit `http://localhost:8000`
 
 ### Default Admin User
 The application creates a default admin user:
@@ -112,6 +106,45 @@ The application creates a default admin user:
 - **Password:** `admin123`
 
 ⚠️ **Important:** Change this password after first login!
+
+### Updating Admin Password
+
+You can securely update the admin password using the provided script:
+
+#### Docker Compose (Recommended)
+```bash
+# Interactive mode - password input will be hidden
+docker-compose exec web python scripts/update_admin_password.py
+
+# Or if containers are stopped:
+docker-compose run --rm web python scripts/update_admin_password.py
+```
+
+#### Direct Password (Non-Interactive)
+```bash
+# Provide password directly as argument
+docker-compose exec web python scripts/update_admin_password.py "your_new_secure_password"
+
+# Using environment variable for security
+export NEW_ADMIN_PASSWORD="your_new_secure_password"
+docker-compose run --rm web python scripts/update_admin_password.py "$NEW_ADMIN_PASSWORD"
+```
+
+#### Local Development
+```bash
+# Run the script directly
+python scripts/update_admin_password.py
+
+# Or with password argument
+python scripts/update_admin_password.py "your_new_secure_password"
+```
+
+**Features:**
+- ✅ Secure password input (hidden typing)
+- ✅ Password confirmation in interactive mode
+- ✅ Minimum length validation (6+ characters)
+- ✅ Uses the same encryption as the application
+- ✅ Works with any database configuration
 
 ## Configuration
 
@@ -132,9 +165,6 @@ DATABASE_URL=sqlite:///pastebin_dev.db
 
 # API Configuration
 API_BASE_URL=http://localhost:5000
-
-# Port Configuration (use 8000 on macOS if port 5000 conflicts with AirPlay)
-PORT=5000
 ```
 
 ### Production Deployment

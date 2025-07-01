@@ -1,11 +1,4 @@
-from flask import (
-    Blueprint,
-    flash,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
@@ -42,9 +35,7 @@ def highlight_code_preview(content, language, max_length=120):
         preview_content = (
             content.replace("\n", " ").replace("\r", " ").replace("\t", " ")
         )
-        preview_content = " ".join(
-            preview_content.split()
-        )  # Normalize whitespace
+        preview_content = " ".join(preview_content.split())  # Normalize whitespace
         preview_content = preview_content[:max_length]
         if len(content) > max_length:
             preview_content += "..."
@@ -109,9 +100,7 @@ def create_paste():
         flash("Paste created successfully!", "success")
         return redirect(url_for("web.view_paste", unique_id=paste.unique_id))
 
-    return render_template(
-        "create_paste.html", title="Create Paste", form=form
-    )
+    return render_template("create_paste.html", title="Create Paste", form=form)
 
 
 @web_bp.route("/paste/<unique_id>")

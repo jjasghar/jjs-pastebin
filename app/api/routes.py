@@ -44,9 +44,7 @@ def api_login():
 def api_register():
     """API registration endpoint"""
     data = request.get_json()
-    if not data or not all(
-        k in data for k in ["username", "email", "password"]
-    ):
+    if not data or not all(k in data for k in ["username", "email", "password"]):
         return (
             jsonify({"error": "Username, email, and password required"}),
             400,
@@ -66,9 +64,7 @@ def api_register():
     db.session.commit()
 
     return (
-        jsonify(
-            {"message": "User created successfully", "user": user.to_dict()}
-        ),
+        jsonify({"message": "User created successfully", "user": user.to_dict()}),
         201,
     )
 
@@ -91,9 +87,7 @@ def get_pastes():
     # Search in title and content if specified
     if search:
         query = query.filter(
-            db.or_(
-                Paste.title.contains(search), Paste.content.contains(search)
-            )
+            db.or_(Paste.title.contains(search), Paste.content.contains(search))
         )
 
     pastes = query.order_by(Paste.created_at.desc()).paginate(
@@ -155,9 +149,9 @@ def get_paste(unique_id):
             auth_header = request.headers["Authorization"]
             if auth_header.startswith("Basic "):
                 try:
-                    credentials = base64.b64decode(
-                        auth_header.split(" ")[1]
-                    ).decode("utf-8")
+                    credentials = base64.b64decode(auth_header.split(" ")[1]).decode(
+                        "utf-8"
+                    )
                     username, password = credentials.split(":", 1)
                     user = User.query.filter_by(username=username).first()
                     if user and user.check_password(password):
@@ -257,9 +251,9 @@ def get_user_pastes():
     page = request.args.get("page", 1, type=int)
     per_page = min(request.args.get("per_page", 20, type=int), 100)
 
-    pastes = request.current_user.pastes.order_by(
-        Paste.created_at.desc()
-    ).paginate(page=page, per_page=per_page, error_out=False)
+    pastes = request.current_user.pastes.order_by(Paste.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
 
     return jsonify(
         {

@@ -5,7 +5,6 @@ Tests for API endpoints.
 import base64
 import json
 
-
 from app import db
 from app.models import Paste, User
 
@@ -101,17 +100,13 @@ class TestAPIPastes:
         assert data["language"] == test_paste.language
         assert data["id"] == test_paste.unique_id
 
-    def test_get_private_paste_unauthorized(
-        self, client, private_paste, api_headers
-    ):
+    def test_get_private_paste_unauthorized(self, client, private_paste, api_headers):
         """Test accessing private paste without authentication."""
         response = client.get(
             f"/api/pastes/{private_paste.unique_id}", headers=api_headers
         )
 
-        assert (
-            response.status_code == 404
-        )  # Private pastes return 404 to non-owners
+        assert response.status_code == 404  # Private pastes return 404 to non-owners
 
     def test_get_private_paste_authorized(
         self, client, test_user, private_paste, api_headers
@@ -120,9 +115,7 @@ class TestAPIPastes:
         auth_string = base64.b64encode(b"testuser:testpass").decode("utf-8")
         headers = {**api_headers, "Authorization": f"Basic {auth_string}"}
 
-        response = client.get(
-            f"/api/pastes/{private_paste.unique_id}", headers=headers
-        )
+        response = client.get(f"/api/pastes/{private_paste.unique_id}", headers=headers)
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -232,9 +225,7 @@ class TestAPIPastes:
 
         assert response.status_code == 401
 
-    def test_update_paste_wrong_user(
-        self, client, app, test_paste, api_headers
-    ):
+    def test_update_paste_wrong_user(self, client, app, test_paste, api_headers):
         """Test updating paste as different user."""
         with app.app_context():
             # Create another user
@@ -259,9 +250,7 @@ class TestAPIPastes:
         auth_string = base64.b64encode(b"testuser:testpass").decode("utf-8")
         headers = {**api_headers, "Authorization": f"Basic {auth_string}"}
 
-        response = client.delete(
-            f"/api/pastes/{test_paste.unique_id}", headers=headers
-        )
+        response = client.delete(f"/api/pastes/{test_paste.unique_id}", headers=headers)
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -307,17 +296,13 @@ class TestAPIUsers:
 
     def test_get_user_pastes_nonexistent(self, client, api_headers):
         """Test getting pastes for non-existent user."""
-        response = client.get(
-            "/api/users/nonexistent/pastes", headers=api_headers
-        )
+        response = client.get("/api/users/nonexistent/pastes", headers=api_headers)
 
         assert response.status_code == 404
 
     def test_get_user_profile(self, client, test_user, api_headers):
         """Test GET /api/users/<username> - get user profile."""
-        response = client.get(
-            f"/api/users/{test_user.username}", headers=api_headers
-        )
+        response = client.get(f"/api/users/{test_user.username}", headers=api_headers)
 
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -354,16 +339,12 @@ class TestAPIFiltering:
             )
 
         # Filter by Python
-        response = client.get(
-            "/api/pastes?language=python", headers=api_headers
-        )
+        response = client.get("/api/pastes?language=python", headers=api_headers)
         assert response.status_code == 200
         data = json.loads(response.data)
 
         # Should have 2 Python pastes
-        python_pastes = [
-            p for p in data["pastes"] if p["language"] == "python"
-        ]
+        python_pastes = [p for p in data["pastes"] if p["language"] == "python"]
         assert len(python_pastes) == 2
 
     def test_pagination(self, client, test_user, api_headers):
@@ -376,15 +357,11 @@ class TestAPIFiltering:
             client.post(
                 "/api/pastes",
                 headers=headers,
-                data=json.dumps(
-                    {"title": f"Paste {i}", "content": f"content {i}"}
-                ),
+                data=json.dumps({"title": f"Paste {i}", "content": f"content {i}"}),
             )
 
         # Test first page
-        response = client.get(
-            "/api/pastes?page=1&per_page=10", headers=api_headers
-        )
+        response = client.get("/api/pastes?page=1&per_page=10", headers=api_headers)
         assert response.status_code == 200
         data = json.loads(response.data)
 

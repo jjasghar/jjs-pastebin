@@ -1,11 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import (
-    BooleanField,
-    SelectField,
-    StringField,
-    SubmitField,
-    TextAreaField,
-)
+from wtforms import BooleanField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length
 
 # Common programming languages for syntax highlighting
@@ -50,7 +44,5 @@ class PasteForm(FlaskForm):
         },
     )
     language = SelectField("Language", choices=LANGUAGES, default="text")
-    is_public = BooleanField(
-        "Public", default=True, false_values=("false", "")
-    )
+    is_public = BooleanField("Public", default=True, false_values=("false", ""))
     submit = SubmitField("Create Paste")

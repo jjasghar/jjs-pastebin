@@ -37,9 +37,7 @@ class TestCLI:
         mock_post.return_value = mock_response
 
         # Create temporary file
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write('print("Hello, World!")')
             temp_file = f.name
 
@@ -90,9 +88,7 @@ class TestCLI:
         }
         mock_post.return_value = mock_response
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".js", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False) as f:
             f.write('console.log("test");')
             temp_file = f.name
 
@@ -168,9 +164,7 @@ class TestCLI:
         mock_post.return_value = mock_response
 
         # Test Python file
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write("def hello(): pass")
             temp_file = f.name
 
@@ -233,10 +227,7 @@ class TestCLI:
         result = runner.invoke(cli_main, ["paste", "nonexistent.txt"])
 
         assert result.exit_code != 0
-        assert (
-            "not found" in result.output.lower()
-            or "error" in result.output.lower()
-        )
+        assert "not found" in result.output.lower() or "error" in result.output.lower()
 
     def test_paste_help(self):
         """Test paste command help."""
@@ -273,9 +264,7 @@ class TestCLIIntegration:
 
 print(fibonacci(10))"""
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write(test_content)
             temp_file = f.name
 

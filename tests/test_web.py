@@ -15,10 +15,7 @@ class TestHomeRoutes:
 
         assert response.status_code == 200
         assert b"JJ Pastebin" in response.data or b"Pastebin" in response.data
-        assert (
-            b"Recent Pastes" in response.data
-            or b"pastes" in response.data.lower()
-        )
+        assert b"Recent Pastes" in response.data or b"pastes" in response.data.lower()
 
     def test_home_page_with_pastes(self, client, test_paste):
         """Test home page displays pastes."""
@@ -289,8 +286,7 @@ class TestUserRoutes:
         assert response.status_code == 200
         assert test_user.username.encode() in response.data
         assert (
-            b"Profile" in response.data
-            or test_user.username.encode() in response.data
+            b"Profile" in response.data or test_user.username.encode() in response.data
         )
 
     def test_user_profile_shows_pastes(self, client, test_user, test_paste):
@@ -307,9 +303,7 @@ class TestUserRoutes:
 
         assert response.status_code == 404
 
-    def test_user_profile_private_pastes(
-        self, client, auth, test_user, private_paste
-    ):
+    def test_user_profile_private_pastes(self, client, auth, test_user, private_paste):
         """Test that private pastes are shown to owner."""
         auth.login("testuser", "testpass")
 
@@ -354,10 +348,7 @@ class TestLanguageRoutes:
         response = client.get("/language/nonexistent")
 
         assert response.status_code == 200  # Should show empty results
-        assert (
-            b"No pastes found" in response.data
-            or b"pastes" in response.data.lower()
-        )
+        assert b"No pastes found" in response.data or b"pastes" in response.data.lower()
 
 
 class TestDocumentationRoutes:
@@ -491,6 +482,4 @@ class TestSecurityFeatures:
         # Try SQL injection in paste ID
         response = client.get("/paste/'; DROP TABLE pastes; --")
 
-        assert (
-            response.status_code == 404
-        )  # Should safely return 404, not crash
+        assert response.status_code == 404  # Should safely return 404, not crash

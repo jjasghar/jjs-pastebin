@@ -113,9 +113,7 @@ def test_user(app):
 def admin_user(app):
     """Create an admin user and return user data."""
     with app.app_context():
-        admin = User(
-            username="admin", email="admin@example.com", is_superuser=True
-        )
+        admin = User(username="admin", email="admin@example.com", is_superuser=True)
         admin.set_password("adminpass")
         db.session.add(admin)
         db.session.commit()
@@ -156,9 +154,7 @@ def test_paste(app, test_user):
 
     # Return a simple object with paste data
     class PasteData:
-        def __init__(
-            self, id, unique_id, title, content, language, views, is_public
-        ):
+        def __init__(self, id, unique_id, title, content, language, views, is_public):
             self.id = id
             self.unique_id = unique_id
             self.title = title
@@ -167,9 +163,7 @@ def test_paste(app, test_user):
             self.views = views
             self.is_public = is_public
 
-    return PasteData(
-        paste_id, unique_id, title, content, language, views, is_public
-    )
+    return PasteData(paste_id, unique_id, title, content, language, views, is_public)
 
 
 @pytest.fixture
@@ -195,9 +189,7 @@ def private_paste(app, test_user):
 
     # Return a simple object with paste data
     class PasteData:
-        def __init__(
-            self, id, unique_id, title, content, language, views, is_public
-        ):
+        def __init__(self, id, unique_id, title, content, language, views, is_public):
             self.id = id
             self.unique_id = unique_id
             self.title = title
@@ -206,9 +198,7 @@ def private_paste(app, test_user):
             self.views = views
             self.is_public = is_public
 
-    return PasteData(
-        paste_id, unique_id, title, content, language, views, is_public
-    )
+    return PasteData(paste_id, unique_id, title, content, language, views, is_public)
 
 
 @pytest.fixture

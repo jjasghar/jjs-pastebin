@@ -165,9 +165,7 @@ class TestAuth:
 
     def test_login_empty_credentials(self, client):
         """Test login with empty credentials."""
-        response = client.post(
-            "/auth/login", data={"username": "", "password": ""}
-        )
+        response = client.post("/auth/login", data={"username": "", "password": ""})
 
         assert response.status_code == 200  # Form redisplayed with errors
         # Should have validation errors for required fields
@@ -243,9 +241,7 @@ class TestAuthProtectedRoutes:
         assert response.status_code == 302
         assert "/auth/login" in response.location
 
-    def test_user_profile_accessible_when_logged_in(
-        self, client, auth, test_user
-    ):
+    def test_user_profile_accessible_when_logged_in(self, client, auth, test_user):
         """Test user profile is accessible when logged in."""
         auth.login("testuser", "testpass")
 
@@ -253,9 +249,7 @@ class TestAuthProtectedRoutes:
         assert response.status_code == 200
         assert b"testuser" in response.data
 
-    def test_create_paste_accessible_when_logged_in(
-        self, client, auth, test_user
-    ):
+    def test_create_paste_accessible_when_logged_in(self, client, auth, test_user):
         """Test create paste page is accessible when logged in."""
         auth.login("testuser", "testpass")
 

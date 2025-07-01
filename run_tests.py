@@ -43,20 +43,14 @@ def main():
         action="store_true",
         help="Run tests with coverage report",
     )
-    parser.add_argument(
-        "--lint", action="store_true", help="Run linting checks"
-    )
-    parser.add_argument(
-        "--security", action="store_true", help="Run security checks"
-    )
+    parser.add_argument("--lint", action="store_true", help="Run linting checks")
+    parser.add_argument("--security", action="store_true", help="Run security checks")
     parser.add_argument(
         "--install-deps",
         action="store_true",
         help="Install test dependencies first",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Verbose output"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
     args = parser.parse_args()
 
@@ -122,9 +116,7 @@ def main():
             "Security check with Bandit",
         )
 
-        success &= run_command(
-            ["safety", "check"], "Dependency security check"
-        )
+        success &= run_command(["safety", "check"], "Dependency security check")
 
     # Build pytest command
     pytest_cmd = [sys.executable, "-m", "pytest", "tests/"]
@@ -164,8 +156,7 @@ def main():
     # Run tests
     success &= run_command(
         pytest_cmd,
-        f"Running {args.type} tests"
-        + (" with coverage" if args.coverage else ""),
+        f"Running {args.type} tests" + (" with coverage" if args.coverage else ""),
     )
 
     # Final report

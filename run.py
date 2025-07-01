@@ -17,9 +17,7 @@ def deploy():
     # Create a default admin user if it doesn't exist
     admin_user = User.query.filter_by(username="admin").first()
     if not admin_user:
-        admin = User(
-            username="admin", email="admin@example.com", is_superuser=True
-        )
+        admin = User(username="admin", email="admin@example.com", is_superuser=True)
         admin.set_password("admin123")
         db.session.add(admin)
         db.session.commit()

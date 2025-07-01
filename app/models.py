@@ -24,9 +24,9 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         """Hash and set password"""
         salt = bcrypt.gensalt()
-        self.password_hash = bcrypt.hashpw(
-            password.encode("utf-8"), salt
-        ).decode("utf-8")
+        self.password_hash = bcrypt.hashpw(password.encode("utf-8"), salt).decode(
+            "utf-8"
+        )
 
     def check_password(self, password):
         """Check if provided password matches hash"""
@@ -52,9 +52,7 @@ class User(UserMixin, db.Model):
 
 class Paste(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    unique_id = db.Column(
-        db.String(16), unique=True, nullable=False, index=True
-    )
+    unique_id = db.Column(db.String(16), unique=True, nullable=False, index=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     language = db.Column(db.String(50), default="text")
@@ -78,9 +76,7 @@ class Paste(db.Model):
         """Generate a unique ID for the paste"""
         characters = string.ascii_letters + string.digits
         while True:
-            unique_id = "".join(
-                random.choice(characters) for _ in range(length)
-            )
+            unique_id = "".join(random.choice(characters) for _ in range(length))
             if not Paste.query.filter_by(unique_id=unique_id).first():
                 return unique_id
 

@@ -189,9 +189,7 @@ def paste(file, title, language, private, api_url):
 
 @cli.command()
 @click.option("--username", "-u", prompt=True, help="Username")
-@click.option(
-    "--password", "-p", prompt=True, hide_input=True, help="Password"
-)
+@click.option("--password", "-p", prompt=True, hide_input=True, help="Password")
 def login(username, password):
     """Login and save credentials"""
     data = {"username": username, "password": password}
@@ -206,9 +204,7 @@ def login(username, password):
         if response.status_code == 200:
             result = response.json()
             config.set_token(result["token"])
-            click.echo(
-                f"Logged in successfully as {result['user']['username']}"
-            )
+            click.echo(f"Logged in successfully as {result['user']['username']}")
         else:
             click.echo(
                 f"Login failed: {response.json().get('error', 'Unknown error')}",
@@ -250,9 +246,7 @@ def list(page):
                 click.echo("No pastes found")
                 return
 
-            click.echo(
-                f"Your pastes (Page {data['current_page']} of {data['pages']}):"
-            )
+            click.echo(f"Your pastes (Page {data['current_page']} of {data['pages']}):")
             click.echo("-" * 60)
 
             for paste in pastes:
@@ -308,9 +302,7 @@ def view(paste_id):
 
 @cli.command()
 @click.argument("paste_id")
-@click.confirmation_option(
-    prompt="Are you sure you want to delete this paste?"
-)
+@click.confirmation_option(prompt="Are you sure you want to delete this paste?")
 def delete(paste_id):
     """Delete a paste"""
     if not config.get_token():

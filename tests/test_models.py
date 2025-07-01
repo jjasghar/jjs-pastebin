@@ -53,12 +53,8 @@ class TestUser:
             user = User.query.get(test_user.id)
 
             # Create pastes for the user
-            paste1 = Paste(
-                title="Paste 1", content="content1", user_id=user.id
-            )
-            paste2 = Paste(
-                title="Paste 2", content="content2", user_id=user.id
-            )
+            paste1 = Paste(title="Paste 1", content="content1", user_id=user.id)
+            paste2 = Paste(title="Paste 2", content="content2", user_id=user.id)
 
             db.session.add_all([paste1, paste2])
             db.session.commit()
@@ -100,12 +96,8 @@ class TestPaste:
     def test_paste_unique_id_generation(self, app, test_user):
         """Test that unique IDs are generated and unique."""
         with app.app_context():
-            paste1 = Paste(
-                title="Paste 1", content="content1", user_id=test_user.id
-            )
-            paste2 = Paste(
-                title="Paste 2", content="content2", user_id=test_user.id
-            )
+            paste1 = Paste(title="Paste 1", content="content1", user_id=test_user.id)
+            paste2 = Paste(title="Paste 2", content="content2", user_id=test_user.id)
 
             db.session.add_all([paste1, paste2])
             db.session.commit()
@@ -117,9 +109,7 @@ class TestPaste:
     def test_paste_repr(self, app, test_user):
         """Test paste string representation."""
         with app.app_context():
-            paste = Paste(
-                title="Test Paste", content="content", user_id=test_user.id
-            )
+            paste = Paste(title="Test Paste", content="content", user_id=test_user.id)
             db.session.add(paste)
             db.session.commit()
 
@@ -130,9 +120,7 @@ class TestPaste:
     def test_paste_author_relationship(self, app, test_user):
         """Test paste-author relationship."""
         with app.app_context():
-            paste = Paste(
-                title="Test Paste", content="content", user_id=test_user.id
-            )
+            paste = Paste(title="Test Paste", content="content", user_id=test_user.id)
             db.session.add(paste)
             db.session.commit()
 

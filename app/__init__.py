@@ -17,9 +17,7 @@ def create_app(config_name=None):
         config_name = os.environ.get("FLASK_ENV", "development")
 
     # Specify template folder relative to the project root
-    app = Flask(
-        __name__, template_folder="../templates", static_folder="../static"
-    )
+    app = Flask(__name__, template_folder="../templates", static_folder="../static")
     app.config.from_object(config[config_name])
 
     # Initialize extensions
