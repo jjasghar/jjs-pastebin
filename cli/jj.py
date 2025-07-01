@@ -10,6 +10,7 @@ Usage:
     jj list                   - List your pastes
     jj view <paste_id>        - View a paste
     jj delete <paste_id>      - Delete a paste
+    jj version                - Show version information
 """
 
 import click
@@ -19,6 +20,12 @@ import sys
 import json
 import base64
 from pathlib import Path
+
+# Version information
+try:
+    from . import __version__
+except ImportError:
+    __version__ = "1.0.0"
 
 # Configuration
 CONFIG_DIR = Path.home() / '.jj'
@@ -301,6 +308,11 @@ def delete(paste_id):
     except requests.exceptions.RequestException as e:
         click.echo(f"Error connecting to API: {e}", err=True)
         sys.exit(1)
+
+@cli.command()
+def version():
+    """Show version information"""
+    click.echo(f"JJ Pastebin CLI Version: {__version__}")
 
 if __name__ == '__main__':
     cli() 

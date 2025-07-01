@@ -1,0 +1,5 @@
+# JJ Pastebin CLI Requirements
+# Minimal dependencies for the command-line tool
+
+click>=8.0.0
+requests>=2.25.0 
