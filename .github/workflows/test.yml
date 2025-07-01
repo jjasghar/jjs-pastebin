@@ -40,6 +40,8 @@ jobs:
         fi
         # Install Werkzeug compatible version
         pip install "Werkzeug<3.0.0"
+        # Install package in development mode to make app/cli modules available
+        pip install -e .
     
     - name: Create instance directory
       run: mkdir -p instance
@@ -76,6 +78,8 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
         pip install "Werkzeug<3.0.0"
+        # Install package in development mode for linting
+        pip install -e .
     
     - name: Lint with flake8
       run: |
@@ -114,6 +118,8 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-dev.txt
         pip install "Werkzeug<3.0.0"
+        # Install package in development mode for security scanning
+        pip install -e .
     
     - name: Run bandit security linter
       run: |
@@ -166,6 +172,8 @@ jobs:
         pip install "Werkzeug<3.0.0"
         # Install PostgreSQL adapter for integration tests
         pip install psycopg2-binary
+        # Install package in development mode for integration tests
+        pip install -e .
     
     - name: Create instance directory
       run: mkdir -p instance
