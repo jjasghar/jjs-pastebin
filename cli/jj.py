@@ -171,7 +171,10 @@ def paste(file, title, language, private, api_url):
 
         if response.status_code == 201:
             paste_data = response.json()
-            paste_url = f"{config.get_api_url().replace('/api', '')}/paste/{paste_data['unique_id']}"
+            paste_url = (
+                f"{config.get_api_url().replace('/api', '')}"
+                f"/paste/{paste_data['unique_id']}"
+            )
             click.echo("Paste created successfully!")
             click.echo(f"URL: {paste_url}")
             click.echo(f"ID: {paste_data['unique_id']}")

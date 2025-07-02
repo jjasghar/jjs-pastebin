@@ -14,7 +14,10 @@ def read_readme():
     if os.path.exists(readme_path):
         with open(readme_path, "r", encoding="utf-8") as f:
             return f.read()
-    return "A command-line tool for uploading and managing code snippets with any pastebin-compatible service."
+    return (
+        "A command-line tool for uploading and managing code snippets "
+        "with any pastebin-compatible service."
+    )
 
 
 # Read version from cli module
@@ -32,7 +35,10 @@ setup(
     version="1.0.0",
     author="JJ Asghar",
     author_email="jj@jjasghar.io",
-    description="A modern command-line pastebin client with support for syntax highlighting and private pastes",
+    description=(
+        "A modern command-line pastebin client with support for "
+        "syntax highlighting and private pastes"
+    ),
     long_description=read_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/jjasghar/jjs-pastebin",

@@ -119,7 +119,7 @@ def test_install():
     wheel_file = wheel_files[0]
 
     # Test with pip show what would be installed
-    result = subprocess.run(
+    subprocess.run(
         ["pip", "show", "--verbose", str(wheel_file)],
         capture_output=True,
         text=True,
@@ -134,7 +134,8 @@ def upload_test():
     print("\n🚀 Ready to upload to Test PyPI")
     print("Run: twine upload --repository testpypi dist/*")
     print(
-        "Then test install: pip install --index-url https://test.pypi.org/simple/ jj-pastebin-cli"
+        "Then test install: pip install --index-url "
+        "https://test.pypi.org/simple/ jj-pastebin-cli"
     )
 
 
@@ -185,7 +186,8 @@ def main():
     print("\nNext steps:")
     print("1. Test PyPI: twine upload --repository testpypi dist/*")
     print(
-        "2. Test install: pip install --index-url https://test.pypi.org/simple/ jj-pastebin-cli"
+        "2. Test install: pip install --index-url "
+        "https://test.pypi.org/simple/ jj-pastebin-cli"
     )
     print("3. Production: twine upload dist/*")
 

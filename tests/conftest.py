@@ -212,8 +212,19 @@ def sample_code():
     """Sample code snippets for testing."""
     return {
         "python": 'def hello():\n    print("Hello, World!")\n\nhello()',
-        "javascript": 'function hello() {\n    console.log("Hello, World!");\n}\n\nhello();',
-        "html": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Test</title>\n</head>\n<body>\n    <h1>Hello, World!</h1>\n</body>\n</html>",
-        "css": "body {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    padding: 20px;\n}",
-        "json": '{\n    "name": "test",\n    "version": "1.0.0",\n    "description": "Test JSON"\n}',
+        "javascript": (
+            'function hello() {\n    console.log("Hello, World!");\n}\n\nhello();'
+        ),
+        "html": (
+            "<!DOCTYPE html>\n<html>\n<head>\n    <title>Test</title>\n</head>\n"
+            "<body>\n    <h1>Hello, World!</h1>\n</body>\n</html>"
+        ),
+        "css": (
+            "body {\n    font-family: Arial, sans-serif;\n    margin: 0;\n    "
+            "padding: 20px;\n}"
+        ),
+        "json": (
+            '{\n    "name": "test",\n    "version": "1.0.0",\n    '
+            '"description": "Test JSON"\n}'
+        ),
     }
